@@ -6,24 +6,63 @@
 <title>Меню</title>
 
 <style>
+/* Полный мобильный reset против горизонтального скролла */
+*,*::before,*::after{
+  box-sizing:border-box;
+  max-width:100%;
+}
+
 html,body{
   margin:0;
-  height:100%;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  background:#fff
-}
-iframe{
   width:100%;
-  height:100%;
-  border:0;
-  display:block
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  background:#f5f5f5;
+  font-family:system-ui,-apple-system,sans-serif;
+}
+
+main{
+  max-width:600px;
+  margin:auto;
+  padding:12px;
+  background:#fff;
+}
+
+/* Медиа всегда вписываются */
+img,svg,video,canvas{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+/* Таблицы */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+/* Текст не ломает ширину */
+p,h1,h2,h3,h4,h5,h6{
+  overflow-wrap:break-word;
 }
 </style>
 </head>
 
 <body>
-<iframe src="menu.html" loading="eager"></iframe>
+
+<main id="app"></main>
+
+<script>
+fetch('menu.html')
+  .then(r=>r.text())
+  .then(html=>{
+    document.getElementById('app').innerHTML = html;
+  })
+  .catch(()=>{
+    document.getElementById('app').textContent =
+      'Не удалось загрузить меню';
+  });
+</script>
+
 </body>
 </html>
