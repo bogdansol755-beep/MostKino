@@ -9,20 +9,54 @@
 body{
   margin:0;
   background:#f5f5f5;
-  display:flex;
-  justify-content:center;
+  font-family:sans-serif;
+  scroll-behavior:smooth
 }
-img{
+#pdf{max-width:900px;margin:auto;padding:8px}
+canvas{
   width:100%;
-  max-width:900px;
-  height:auto;
   display:block;
+  margin-bottom:12px;
+  background:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.08)
 }
 </style>
 </head>
 
 <body>
-  <img src="menu.jpg" alt="Меню бара">
+<div id="pdf"></div>
+
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+(async()=>{
+  const pdf=await pdfjsLib.getDocument('menu.pdf').promise,
+        box=document.getElementById('pdf'),
+        io=new IntersectionObserver(e=>e.forEach(x=>{
+          if(x.isIntersecting){
+            draw(+x.target.dataset.p);
+            io.unobserve(x.target);
+          }
+        }),{rootMargin:'300px'});
+
+  for(let i=1;i<=pdf.numPages;i++){
+    const d=document.createElement('div');
+    d.dataset.p=i; box.appendChild(d); io.observe(d);
+  }
+
+  async function draw(n){
+    const p=await pdf.getPage(n),
+          v=p.getViewport({scale:1}),
+          s=Math.min(box.clientWidth/v.width,1.4),
+          c=document.createElement('canvas');
+    c.width=v.width*s; c.height=v.height*s;
+    await p.render({canvasContext:c.getContext('2d'),
+      viewport:p.getViewport({scale:s})}).promise;
+    box.querySelector(`[data-p="${n}"]`).replaceWith(c);
+  }
+})();
+</script>
 </body>
 </html>
-
